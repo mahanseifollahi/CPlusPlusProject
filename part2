@@ -4,6 +4,7 @@
 
 const double PI = 3.14159;  
 
+template <typename T>  
 class Shape {  
 public:  
     virtual double getVolume() const = 0;  
@@ -13,11 +14,12 @@ public:
     virtual ~Shape() {}  
 };  
 
-class Cylinder : public Shape {  
-    double height, radius;  
+template <typename T>  
+class Cylinder : public Shape<T> {  
+    T height, radius;  
 
 public:  
-    Cylinder(double h, double r) : height(h), radius(r) {}  
+    Cylinder(T h, T r) : height(h), radius(r) {}  
 
     double getVolume() const override {  
         return PI * radius * radius * height;  
@@ -36,11 +38,12 @@ public:
     }  
 };  
 
-class Box : public Shape {  
-    double length;  
+template <typename T>  
+class Box : public Shape<T> {  
+    T length;  
 
 public:  
-    Box(double l) : length(l) {}  
+    Box(T l) : length(l) {}  
 
     double getVolume() const override {  
         return length * length * length;  
@@ -59,11 +62,12 @@ public:
     }  
 };  
 
-class Sphere : public Shape {  
-    double radius;  
+template <typename T>  
+class Sphere : public Shape<T> {  
+    T radius;  
 
 public:  
-    Sphere(double r) : radius(r) {}  
+    Sphere(T r) : radius(r) {}  
 
     double getVolume() const override {  
         return (4.0 / 3.0) * PI * radius * radius * radius;  
@@ -82,14 +86,15 @@ public:
     }  
 };  
 
+template <typename T>  
 class Container {  
     std::string name;  
-    std::vector<Shape*> shapes;  
+    std::vector<Shape<T>*> shapes;  
 
 public:  
     Container(const std::string& containerName) : name(containerName) {}  
 
-    void addShape(const Shape& shape) {  
+    void addShape(const Shape<T>& shape) {  
         shapes.push_back(shape.clone());  
     }  
 
@@ -108,16 +113,20 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Container& container) {  
         out << "Container: " << container.name << "\n";  
         out << "Total Volume: " << container.totalVolume() << "\n";  
+        for (const auto& shape : container.shapes) {  
+            shape->display(out);  
+            out << "\n";  
+        }  
         return out;  
     }  
 };  
 
 int main() {  
     // Create a container and add shapes  
-    Container mainContainer("Main Container");  
-    mainContainer.addShape(Box(2.0));  
-    mainContainer.addShape(Sphere(3.0));  
-    mainContainer.addShape(Cylinder(5.0, 2.0));  
+    Container<double> mainContainer("Main Container");  
+    mainContainer.addShape(Box<double>(2.0));  
+    mainContainer.addShape(Sphere<double>(3.0));  
+    mainContainer.addShape(Cylinder<double>(5.0, 2.0));  
 
     // Display the properties of the container  
     std::cout << mainContainer;  
