@@ -1,0 +1,126 @@
+#include <iostream>  
+#include <vector>  
+#include <cmath>  
+
+const double PI = 3.14159;  
+
+class Shape {  
+public:  
+    virtual double getVolume() const = 0;  
+    virtual double getSurfaceArea() const = 0;  
+    virtual void display(std::ostream& out) const = 0;  
+    virtual Shape* clone() const = 0;  
+    virtual ~Shape() {}  
+};  
+
+class Cylinder : public Shape {  
+    double height, radius;  
+
+public:  
+    Cylinder(double h, double r) : height(h), radius(r) {}  
+
+    double getVolume() const override {  
+        return PI * radius * radius * height;  
+    }  
+
+    double getSurfaceArea() const override {  
+        return 2 * PI * radius * (radius + height);  
+    }  
+
+    void display(std::ostream& out) const override {  
+        out << "Cylinder: height=" << height << ", radius=" << radius;  
+    }  
+
+    Cylinder* clone() const override {  
+        return new Cylinder(*this);  
+    }  
+};  
+
+class Box : public Shape {  
+    double length;  
+
+public:  
+    Box(double l) : length(l) {}  
+
+    double getVolume() const override {  
+        return length * length * length;  
+    }  
+
+    double getSurfaceArea() const override {  
+        return 6 * length * length;  
+    }  
+
+    void display(std::ostream& out) const override {  
+        out << "Box: length=" << length;  
+    }  
+
+    Box* clone() const override {  
+        return new Box(*this);  
+    }  
+};  
+
+class Sphere : public Shape {  
+    double radius;  
+
+public:  
+    Sphere(double r) : radius(r) {}  
+
+    double getVolume() const override {  
+        return (4.0 / 3.0) * PI * radius * radius * radius;  
+    }  
+
+    double getSurfaceArea() const override {  
+        return 4 * PI * radius * radius;  
+    }  
+
+    void display(std::ostream& out) const override {  
+        out << "Sphere: radius=" << radius;  
+    }  
+
+    Sphere* clone() const override {  
+        return new Sphere(*this);  
+    }  
+};  
+
+class Container {  
+    std::string name;  
+    std::vector<Shape*> shapes;  
+
+public:  
+    Container(const std::string& containerName) : name(containerName) {}  
+
+    void addShape(const Shape& shape) {  
+        shapes.push_back(shape.clone());  
+    }  
+
+    double totalVolume() const {  
+        double total = 0;  
+        for (const auto& shape : shapes) {  
+            total += shape->getVolume();  
+        }  
+        return total;  
+    }  
+
+    ~Container() {  
+        for (auto shape : shapes) delete shape;  
+    }  
+
+    friend std::ostream& operator<<(std::ostream& out, const Container& container) {  
+        out << "Container: " << container.name << "\n";  
+        out << "Total Volume: " << container.totalVolume() << "\n";  
+        return out;  
+    }  
+};  
+
+int main() {  
+    // Create a container and add shapes  
+    Container mainContainer("Main Container");  
+    mainContainer.addShape(Box(2.0));  
+    mainContainer.addShape(Sphere(3.0));  
+    mainContainer.addShape(Cylinder(5.0, 2.0));  
+
+    // Display the properties of the container  
+    std::cout << mainContainer;  
+
+    return 0;  
+}
